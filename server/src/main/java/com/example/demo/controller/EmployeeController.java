@@ -1,0 +1,54 @@
+package com.example.demo.controller;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.model.Employee;
+import com.example.demo.service.EmployeeService;
+
+@CrossOrigin("http://localhost:3000")
+@RestController
+public class EmployeeController {
+	
+	private EmployeeService employeeService;
+	
+	public EmployeeController(EmployeeService empService) {
+		this.employeeService=empService;
+	}
+	
+	@GetMapping("/getEmployees")
+	public ResponseEntity<?> getEmployee(){
+		List<Employee> employees = employeeService.getAllEmployees();
+		return ResponseEntity.ok(employees);
+	}
+	
+	
+	@PostMapping("/postEmployee")
+	public ResponseEntity<?> postEmployee(@RequestBody Employee employee){
+		Employee newEmployee = employeeService.saveEmployee(employee);
+		return ResponseEntity.ok(newEmployee);
+	}
+	
+	@PutMapping("/putEmployee")
+	public ResponseEntity<?> putEmployee(@RequestBody Employee employee){
+		Employee newEmployee = employeeService.updateEmployee(employee);
+		return ResponseEntity.ok(newEmployee);
+	}
+	
+	@DeleteMapping("/deleteEmployee")
+	public ResponseEntity<?> deleteEmployee(@RequestBody Employee employee){
+		employeeService.deleteEmployee(employee);
+		return new ResponseEntity<String>("Employee Deleted",HttpStatus.OK);
+	}
+
+}

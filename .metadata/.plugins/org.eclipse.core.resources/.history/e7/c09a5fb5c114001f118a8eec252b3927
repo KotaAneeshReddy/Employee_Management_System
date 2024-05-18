@@ -1,0 +1,46 @@
+package com.example.demo.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.model.Employee;
+import com.example.demo.repository.EmployeeRepository;
+
+@Service
+public class EmployeeService {
+	
+	private EmployeeRepository employeeRepo;
+	
+	@Autowired
+	public EmployeeService(EmployeeRepository empRepo) {
+		this.employeeRepo=empRepo;
+	}
+	
+	public List<Employee> getAllEmployees(){
+		return employeeRepo.findAll();
+	}
+	
+	public Employee saveEmployee(Employee employee) {
+		return employeeRepo.save(employee);
+	}
+	
+	public Employee updateEmployee(Employee employee) {
+		Optional<Employee> newEmployee = employeeRepo.findById(employee.getEmp_id());
+		Employee dbEmployee = newEmployee.stream().findFirst().orElse(employee);
+		dbEmployee.setFullName(employee.getFullName());
+		dbEmployee.setEmail(employee.getEmail());
+		dbEmployee.setPhoneNumber(employee.getPhoneNumber());
+		dbEmployee.setGender(employee.getGender());
+		dbEmployee.setRole(employee.getRole());
+		
+		return employeeRepo.save(dbEmployee);
+	}
+	
+	public void deleteEmployee(Integer emp_id) {
+		employeeRepo.deleteById(emp_id);
+	}
+
+}
