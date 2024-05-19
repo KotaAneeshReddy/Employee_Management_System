@@ -1,6 +1,6 @@
 const API_URL = "http://localhost:8080";
 
-async function DeleteEmployee(employee) {
+async function deleteEmployee(employee) {
   try {
     const response = await fetch(`${API_URL}/deleteEmployee`, {
       method: "DELETE",
@@ -18,4 +18,4 @@ async function DeleteEmployee(employee) {
   }
 }
 
-export { DeleteEmployee };
+export { deleteEmployee };

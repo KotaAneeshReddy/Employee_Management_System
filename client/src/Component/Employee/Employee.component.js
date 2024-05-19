@@ -8,22 +8,13 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 
 import "./Employee.styles.css";
-import UpdateEmployee from "../UpdateEmployee/UpdateEmployee.component";
-import { DeleteEmployee } from "../../Service/DeleteEmployee.service";
+import { updateEmployee } from "../../Service/UpdateEmployee.service";
+import { deleteEmployee } from "../../Service/DeleteEmployee.service";
 
 const Employee = () => {
   const [employees, setEmployees] = useState([]);
   const [show, setShow] = useState(false);
-  const [employee, setEmployee] = useState({
-    fullName: "",
-    email: "",
-    phoneNumber: "",
-    gender: "",
-    role: "",
-  });
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const [currentEmployee, setCurrentEmployee] = useState(null);
 
   useEffect(() => {
     async function fetchEmployees() {
@@ -31,42 +22,58 @@ const Employee = () => {
         const result = await getEmployees();
         setEmployees(result);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
 
     fetchEmployees();
   }, []);
 
+  const handleShow = (employee) => {
+    setCurrentEmployee(employee);
+    setShow(true);
+  };
+
+  const handleClose = () => {
+    setCurrentEmployee(null);
+    setShow(false);
+  };
+
   const handleChange = (e) => {
-    setEmployee({ ...employee, [e.target.name]: e.target.value });
-  };
-
-  const RegisterEmployee = (e) => {
-    e.preventDefault();
-
-    UpdateEmployee(employee)
-      .then((res) => {
-        console.log("Employee Added Successfully");
-        setEmployee({
-          fullName: "",
-          email: "",
-          phoneNumber: "",
-          gender: "",
-          role: "",
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const handleDelete = (currentEmployee) => {
-    DeleteEmployee(currentEmployee).then((res) => {
-      console.log("Employee Deleted Succesfully");
-      window.location.reload();
+    setCurrentEmployee({
+      ...currentEmployee,
+      [e.target.name]: e.target.value,
     });
   };
+
+  const handleUpdateEmployee = async (e) => {
+    e.preventDefault();
+    try {
+      await updateEmployee(currentEmployee);
+      console.log("Employee Updated Successfully");
+      const updatedEmployees = employees.map((emp) =>
+        emp.emp_id === currentEmployee.emp_id ? currentEmployee : emp
+      );
+      setEmployees(updatedEmployees);
+      handleClose();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDelete = async (employee) => {
+    try {
+      await deleteEmployee(employee);
+      console.log("Employee Deleted Successfully");
+      const updatedEmployees = employees.filter(
+        (emp) => emp.emp_id !== employee.emp_id
+      );
+      setEmployees(updatedEmployees);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="employee-table">
       <div>
@@ -88,40 +95,39 @@ const Employee = () => {
               <th>Phone</th>
               <th>Gender</th>
               <th>Role</th>
-              <th>Update</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {employees.map((employee, index) => {
-              return (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{employee.emp_id}</td>
-                  <td>{employee.fullName}</td>
-                  <td>{employee.email}</td>
-                  <td>{employee.phoneNumber}</td>
-                  <td>{employee.gender}</td>
-                  <td>{employee.role}</td>
-                  <td>
-                    <span className="span-button">
-                      <Button variant="primary" onClick={handleShow}>
-                        Update
-                      </Button>
-                    </span>
-                    <span>
-                      <Button
-                        variant="success"
-                        onClick={() => {
-                          handleDelete(employee);
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
+            {employees.map((employee, index) => (
+              <tr key={index}>
+                <td>{index + 1}</td>
+                <td>{employee.emp_id}</td>
+                <td>{employee.fullName}</td>
+                <td>{employee.email}</td>
+                <td>{employee.phoneNumber}</td>
+                <td>{employee.gender}</td>
+                <td>{employee.role}</td>
+                <td>
+                  <span className="span-button">
+                    <Button
+                      variant="primary"
+                      onClick={() => handleShow(employee)}
+                    >
+                      Update
+                    </Button>
+                  </span>
+                  <span>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDelete(employee)}
+                    >
+                      Delete
+                    </Button>
+                  </span>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </Table>
         <Modal show={show} onHide={handleClose}>
@@ -129,90 +135,75 @@ const Employee = () => {
             <Modal.Title>Update Employee</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form
-              onSubmit={(e) => {
-                RegisterEmployee(e);
-              }}
-            >
-              <Form.Group className="mb-3" controlId="formBasicText">
-                <Form.Label>Full name</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Full Name"
-                  name="fullName"
-                  value={employee.fullName}
-                  onChange={(e) => {
-                    handleChange(e);
-                  }}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Enter email"
-                  name="email"
-                  value={employee.email}
-                  onChange={(e) => {
-                    handleChange(e);
-                  }}
-                />
-                <Form.Text className="text-muted">
-                  We'll never share your email with anyone else.
-                </Form.Text>
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="formBasicText">
-                <Form.Label>Phone number</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter phone number"
-                  name="phoneNumber"
-                  value={employee.phoneNumber}
-                  onChange={(e) => {
-                    handleChange(e);
-                  }}
-                />
-                <Form.Text className="text-muted">
-                  We'll never share your phone number with anyone else.
-                </Form.Text>
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Select gender</Form.Label>
-                <Form.Select
-                  name="gender"
-                  value={employee.gender}
-                  onChange={(e) => {
-                    handleChange(e);
-                  }}
-                >
-                  <option>Select One</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Not Sure">Not Sure</option>
-                </Form.Select>
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Select role</Form.Label>
-                <Form.Select
-                  name="role"
-                  value={employee.role}
-                  onChange={(e) => {
-                    handleChange(e);
-                  }}
-                >
-                  <option>Select One</option>
-                  <option value="Developer">Developer</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Human Resources">Human Resources</option>
-                </Form.Select>
-              </Form.Group>
-
-              <Button variant="primary" type="submit">
-                Submit
-              </Button>
-            </Form>
+            {currentEmployee && (
+              <Form onSubmit={handleUpdateEmployee}>
+                <Form.Group className="mb-3" controlId="formBasicText">
+                  <Form.Label>Full name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Full Name"
+                    name="fullName"
+                    value={currentEmployee.fullName}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicEmail">
+                  <Form.Label>Email address</Form.Label>
+                  <Form.Control
+                    type="email"
+                    placeholder="Enter email"
+                    name="email"
+                    value={currentEmployee.email}
+                    onChange={handleChange}
+                  />
+                  <Form.Text className="text-muted">
+                    We'll never share your email with anyone else.
+                  </Form.Text>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicText">
+                  <Form.Label>Phone number</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter phone number"
+                    name="phoneNumber"
+                    value={currentEmployee.phoneNumber}
+                    onChange={handleChange}
+                  />
+                  <Form.Text className="text-muted">
+                    We'll never share your phone number with anyone else.
+                  </Form.Text>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Select gender</Form.Label>
+                  <Form.Select
+                    name="gender"
+                    value={currentEmployee.gender}
+                    onChange={handleChange}
+                  >
+                    <option>Select One</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Not Sure">Not Sure</option>
+                  </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Select role</Form.Label>
+                  <Form.Select
+                    name="role"
+                    value={currentEmployee.role}
+                    onChange={handleChange}
+                  >
+                    <option>Select One</option>
+                    <option value="Developer">Developer</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Human Resources">Human Resources</option>
+                  </Form.Select>
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                  Submit
+                </Button>
+              </Form>
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>

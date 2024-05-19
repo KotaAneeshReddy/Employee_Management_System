@@ -1,6 +1,6 @@
 const API_URL = "http://localhost:8080";
 
-async function UpdateEmployee(employee) {
+export async function updateEmployee(employee) {
   try {
     const response = await fetch(API_URL + "/putEmployee", {
       method: "PUT",
@@ -19,4 +19,3 @@ async function UpdateEmployee(employee) {
   }
 }
 
-export default UpdateEmployee;

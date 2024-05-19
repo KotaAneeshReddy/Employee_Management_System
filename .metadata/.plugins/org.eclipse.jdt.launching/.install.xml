@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dirs>
+    <entry loc="/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.macosx.aarch64_17.0.11.v20240426-1830" stamp="1714581256000"/>
+    <entry loc="/Library/Java/JavaVirtualMachines/jdk-22.jdk/Contents/Home" stamp="1716040528959"/>
+    <entry loc="/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.macosx.aarch64_17.0.11.v20240426-1830/jre" stamp="1714581256000"/>
     <entry loc="/Library/Java/JavaVirtualMachines/jdk-14.0.2.jdk/Contents/Home" stamp="1594251855000"/>
     <entry loc="/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.macosx.x86_64_17.0.8.v20230831-1047/jre" stamp="1698280497000"/>
     <entry loc="/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.macosx.x86_64_17.0.8.v20230831-1047" stamp="1698280497000"/>
